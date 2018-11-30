@@ -1,0 +1,2 @@
+[ ] file read with holes
+[ ] truncate non-page aligned file (300 bytes file)

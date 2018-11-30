@@ -1,0 +1,1 @@
+cmd_lib/pci-ring-buffer/build_kernel/pci_ring_buffer.ko := k1om-mpss-linux-ld -r -m elf_k1om --defsym=MIC_KERNEL_VERSION_20626=0 -T /home/heeseung/project/pcie-cloud/phi-kernel-fl/scripts/module-common.lds --build-id  -o lib/pci-ring-buffer/build_kernel/pci_ring_buffer.ko lib/pci-ring-buffer/build_kernel/pci_ring_buffer.o lib/pci-ring-buffer/build_kernel/pci_ring_buffer.mod.o

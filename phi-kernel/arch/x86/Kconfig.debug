@@ -1,0 +1,397 @@
+menu "Kernel hacking"
+
+config TRACE_IRQFLAGS_SUPPORT
+	def_bool y
+
+source "lib/Kconfig.debug"
+
+config STRICT_DEVMEM
+	bool "Filter access to /dev/mem"
+	---help---
+	  If this option is disabled, you allow userspace (root) access to all
+	  of memory, including kernel and userspace memory. Accidental
+	  access to this is obviously disastrous, but specific access can
+	  be used by people debugging the kernel. Note that with PAT support
+	  enabled, even in this case there are restrictions on /dev/mem
+	  use due to the cache aliasing requirements.
+
+	  If this option is switched on, the /dev/mem file only allows
+	  userspace access to PCI space and the BIOS code and data regions.
+	  This is sufficient for dosemu and X and all common users of
+	  /dev/mem.
+
+	  If in doubt, say Y.
+
+config X86_VERBOSE_BOOTUP
+	bool "Enable verbose x86 bootup info messages"
+	default y
+	---help---
+	  Enables the informational output from the decompression stage
+	  (e.g. bzImage) of the boot. If you disable this you will still
+	  see errors. Disable this if you want silent bootup.
+
+config EARLY_PRINTK
+	bool "Early printk" if EXPERT
+	default y
+	---help---
+	  Write kernel log output directly into the VGA buffer or to a serial
+	  port.
+
+	  This is useful for kernel debugging when your machine crashes very
+	  early before the console code is initialized. For normal operation
+	  it is not recommended because it looks ugly and doesn't cooperate
+	  with klogd/syslogd or the X server. You should normally N here,
+	  unless you want to debug such a crash.
+
+config EARLY_PRINTK_MRST
+	bool "Early printk for MRST platform support"
+	depends on EARLY_PRINTK && X86_MRST
+
+config EARLY_PRINTK_DBGP
+	bool "Early printk via EHCI debug port"
+	depends on EARLY_PRINTK && PCI
+	---help---
+	  Write kernel log output directly into the EHCI debug port.
+
+	  This is useful for kernel debugging when your machine crashes very
+	  early before the console code is initialized. For normal operation
+	  it is not recommended because it looks ugly and doesn't cooperate
+	  with klogd/syslogd or the X server. You should normally N here,
+	  unless you want to debug such a crash. You need usb debug device.
+
+config DEBUG_STACKOVERFLOW
+	bool "Check for stack overflows"
+	depends on DEBUG_KERNEL
+	---help---
+	  This option will cause messages to be printed if free stack space
+	  drops below a certain limit.
+
+config DEBUG_STACK_USAGE
+	bool "Stack utilization instrumentation"
+	depends on DEBUG_KERNEL
+	---help---
+	  Enables the display of the minimum amount of free stack which each
+	  task has ever had available in the sysrq-T and sysrq-P debug output.
+
+	  This option will slow down process creation somewhat.
+
+config DEBUG_PER_CPU_MAPS
+	bool "Debug access to per_cpu maps"
+	depends on DEBUG_KERNEL
+	depends on SMP
+	---help---
+	  Say Y to verify that the per_cpu map being accessed has
+	  been setup.  Adds a fair amount of code to kernel memory
+	  and decreases performance.
+
+	  Say N if unsure.
+
+config X86_PTDUMP
+	bool "Export kernel pagetable layout to userspace via debugfs"
+	depends on DEBUG_KERNEL
+	select DEBUG_FS
+	---help---
+	  Say Y here if you want to show the kernel pagetable layout in a
+	  debugfs file. This information is only useful for kernel developers
+	  who are working in architecture specific areas of the kernel.
+	  It is probably not a good idea to enable this feature in a production
+	  kernel.
+	  If in doubt, say "N"
+
+config DEBUG_RODATA
+	bool "Write protect kernel read-only data structures"
+	default y
+	depends on DEBUG_KERNEL
+	---help---
+	  Mark the kernel read-only data as write-protected in the pagetables,
+	  in order to catch accidental (and incorrect) writes to such const
+	  data. This is recommended so that we can catch kernel bugs sooner.
+	  If in doubt, say "Y".
+
+config DEBUG_RODATA_TEST
+	bool "Testcase for the DEBUG_RODATA feature"
+	depends on DEBUG_RODATA
+	default y
+	---help---
+	  This option enables a testcase for the DEBUG_RODATA
+	  feature as well as for the change_page_attr() infrastructure.
+	  If in doubt, say "N"
+
+config DEBUG_SET_MODULE_RONX
+	bool "Set loadable kernel module data as NX and text as RO"
+	depends on MODULES
+	---help---
+	  This option helps catch unintended modifications to loadable
+	  kernel module's text and read-only data. It also prevents execution
+	  of module data. Such protection may interfere with run-time code
+	  patching and dynamic kernel tracing - and they might also protect
+	  against certain classes of kernel exploits.
+	  If in doubt, say "N".
+
+config DEBUG_NX_TEST
+	tristate "Testcase for the NX non-executable stack feature"
+	depends on DEBUG_KERNEL && m
+	---help---
+	  This option enables a testcase for the CPU NX capability
+	  and the software setup of this feature.
+	  If in doubt, say "N"
+
+config DOUBLEFAULT
+	default y
+	bool "Enable doublefault exception handler" if EXPERT
+	depends on X86_32
+	---help---
+	  This option allows trapping of rare doublefault exceptions that
+	  would otherwise cause a system to silently reboot. Disabling this
+	  option saves about 4k and might cause you much additional grey
+	  hair.
+
+config IOMMU_DEBUG
+	bool "Enable IOMMU debugging"
+	depends on GART_IOMMU && DEBUG_KERNEL
+	depends on X86_64
+	---help---
+	  Force the IOMMU to on even when you have less than 4GB of
+	  memory and add debugging code. On overflow always panic. And
+	  allow to enable IOMMU leak tracing. Can be disabled at boot
+	  time with iommu=noforce. This will also enable scatter gather
+	  list merging.  Currently not recommended for production
+	  code. When you use it make sure you have a big enough
+	  IOMMU/AGP aperture.  Most of the options enabled by this can
+	  be set more finegrained using the iommu= command line
+	  options. See Documentation/x86_64/boot-options.txt for more
+	  details.
+
+config IOMMU_STRESS
+	bool "Enable IOMMU stress-test mode"
+	---help---
+	  This option disables various optimizations in IOMMU related
+	  code to do real stress testing of the IOMMU code. This option
+	  will cause a performance drop and should only be enabled for
+	  testing.
+
+config IOMMU_LEAK
+	bool "IOMMU leak tracing"
+	depends on IOMMU_DEBUG && DMA_API_DEBUG
+	---help---
+	  Add a simple leak tracer to the IOMMU code. This is useful when you
+	  are debugging a buggy device driver that leaks IOMMU mappings.
+
+config HAVE_MMIOTRACE_SUPPORT
+	def_bool y
+
+config X86_DECODER_SELFTEST
+	bool "x86 instruction decoder selftest"
+	depends on DEBUG_KERNEL && KPROBES
+	---help---
+	 Perform x86 instruction decoder selftests at build time.
+	 This option is useful for checking the sanity of x86 instruction
+	 decoder code.
+	 If unsure, say "N".
+
+#
+# IO delay types:
+#
+
+config IO_DELAY_TYPE_0X80
+	int
+	default "0"
+
+config IO_DELAY_TYPE_0XED
+	int
+	default "1"
+
+config IO_DELAY_TYPE_UDELAY
+	int
+	default "2"
+
+config IO_DELAY_TYPE_NONE
+	int
+	default "3"
+
+choice
+	prompt "IO delay type"
+	default IO_DELAY_0X80
+
+config IO_DELAY_0X80
+	bool "port 0x80 based port-IO delay [recommended]"
+	---help---
+	  This is the traditional Linux IO delay used for in/out_p.
+	  It is the most tested hence safest selection here.
+
+config IO_DELAY_0XED
+	bool "port 0xed based port-IO delay"
+	---help---
+	  Use port 0xed as the IO delay. This frees up port 0x80 which is
+	  often used as a hardware-debug port.
+
+config IO_DELAY_UDELAY
+	bool "udelay based port-IO delay"
+	---help---
+	  Use udelay(2) as the IO delay method. This provides the delay
+	  while not having any side-effect on the IO port space.
+
+config IO_DELAY_NONE
+	bool "no port-IO delay"
+	---help---
+	  No port-IO delay. Will break on old boxes that require port-IO
+	  delay for certain operations. Should work on most new machines.
+
+endchoice
+
+if IO_DELAY_0X80
+config DEFAULT_IO_DELAY_TYPE
+	int
+	default IO_DELAY_TYPE_0X80
+endif
+
+if IO_DELAY_0XED
+config DEFAULT_IO_DELAY_TYPE
+	int
+	default IO_DELAY_TYPE_0XED
+endif
+
+if IO_DELAY_UDELAY
+config DEFAULT_IO_DELAY_TYPE
+	int
+	default IO_DELAY_TYPE_UDELAY
+endif
+
+if IO_DELAY_NONE
+config DEFAULT_IO_DELAY_TYPE
+	int
+	default IO_DELAY_TYPE_NONE
+endif
+
+config DEBUG_BOOT_PARAMS
+	bool "Debug boot parameters"
+	depends on DEBUG_KERNEL
+	depends on DEBUG_FS
+	---help---
+	  This option will cause struct boot_params to be exported via debugfs.
+
+config CPA_DEBUG
+	bool "CPA self-test code"
+	depends on DEBUG_KERNEL
+	---help---
+	  Do change_page_attr() self-tests every 30 seconds.
+
+config OPTIMIZE_INLINING
+	bool "Allow gcc to uninline functions marked 'inline'"
+	---help---
+	  This option determines if the kernel forces gcc to inline the functions
+	  developers have marked 'inline'. Doing so takes away freedom from gcc to
+	  do what it thinks is best, which is desirable for the gcc 3.x series of
+	  compilers. The gcc 4.x series have a rewritten inlining algorithm and
+	  enabling this option will generate a smaller kernel there. Hopefully
+	  this algorithm is so good that allowing gcc 4.x and above to make the
+	  decision will become the default in the future. Until then this option
+	  is there to test gcc for this.
+
+	  If unsure, say N.
+
+config DEBUG_STRICT_USER_COPY_CHECKS
+	bool "Strict copy size checks"
+	depends on DEBUG_KERNEL && !TRACE_BRANCH_PROFILING
+	---help---
+	  Enabling this option turns a certain set of sanity checks for user
+	  copy operations into compile time failures.
+
+	  The copy_from_user() etc checks are there to help test if there
+	  are sufficient security checks on the length argument of
+	  the copy operation, by having gcc prove that the argument is
+	  within bounds.
+
+	  If unsure, or if you run an older (pre 4.4) gcc, say N.
+
+config KDB
+	bool "Built-in Kernel Debugger support"
+	depends on DEBUG_KERNEL
+	select KALLSYMS
+	select KALLSYMS_ALL
+	select CONSOLE_POLL
+	help
+	  This option provides a built-in kernel debugger.  The built-in
+	  kernel debugger contains commands which allow memory to be examined,
+	  instructions to be disassembled and breakpoints to be set.  For details,
+	  see Documentation/kdb/kdb.mm and the manual pages kdb_bt, kdb_ss, etc.
+	  Kdb can also be used via the serial port.  Set up the system to
+	  have a serial console (see Documentation/serial-console.txt).
+	  The key sequence <escape>KDB on the serial port will cause the
+	  kernel debugger to be entered with input from the serial port and
+	  output to the serial console.  NOTE:  CONFIG_DEBUG_RODATA must be
+	  manually turned off and CONFIG_CONSOLE_POLL is forced on by saying Y.
+	  If unsure, say N.
+
+config KDB_MODULES
+	tristate "KDB modules"
+	depends on KDB
+	help
+	  KDB can be extended by adding your own modules, in directory
+	  kdb/modules.  This option selects the way that these modules should
+	  be compiled, as free standing modules (select M) or built into the
+	  kernel (select Y).  If unsure say M.
+
+config KDB_OFF
+	bool "KDB off by default"
+	depends on KDB
+	help
+	  Normally kdb is activated by default, as long as CONFIG_KDB is set.
+	  If you want to ship a kernel with kdb support but only have kdb
+	  turned on when the user requests it then select this option.  When
+	  compiled with CONFIG_KDB_OFF, kdb ignores all events unless you boot
+	  with kdb=on or you echo "1" > /proc/sys/kernel/kdb.  This option also
+	  works in reverse, if kdb is normally activated, you can boot with
+	  kdb=off or echo "0" > /proc/sys/kernel/kdb to deactivate kdb. If
+	  unsure, say N.
+
+config KDB_CONTINUE_CATASTROPHIC
+	int "KDB continues after catastrophic errors"
+	depends on KDB
+	default "0"
+	help
+	  This integer controls the behaviour of kdb when the kernel gets a
+	  catastrophic error, i.e. for a panic, oops, NMI or other watchdog
+	  tripping.  CONFIG_KDB_CONTINUE_CATASTROPHIC interacts with
+	  /proc/sys/kernel/kdb and CONFIG_LKCD_DUMP (if your kernel has the
+	  LKCD patch).
+	  When KDB is active (/proc/sys/kernel/kdb == 1) and a catastrophic
+	  error occurs, nothing extra happens until you type 'go'.
+	  CONFIG_KDB_CONTINUE_CATASTROPHIC == 0 (default).  The first time
+	  you type 'go', kdb warns you.  The second time you type 'go', KDB
+	  tries to continue - no guarantees that the kernel is still usable.
+	  CONFIG_KDB_CONTINUE_CATASTROPHIC == 1.  KDB tries to continue - no
+	  guarantees that the kernel is still usable.
+	  CONFIG_KDB_CONTINUE_CATASTROPHIC == 2.  If your kernel has the LKCD
+	  patch and LKCD is configured to take a dump then KDB forces a dump.
+	  Whether or not a dump is taken, KDB forces a reboot.
+	  When KDB is not active (/proc/sys/kernel/kdb == 0) and a catastrophic
+	  error occurs, the following steps are automatic, no human
+	  intervention is required.
+	  CONFIG_KDB_CONTINUE_CATASTROPHIC == 0 (default) or 1.  KDB attempts
+	  to continue - no guarantees that the kernel is still usable.
+	  CONFIG_KDB_CONTINUE_CATASTROPHIC == 2.  If your kernel has the LKCD
+	  patch and LKCD is configured to take a dump then KDB automatically
+	  forces a dump.  Whether or not a dump is taken, KDB forces a
+	  reboot.
+	  If you are not sure, say 0.  Read Documentation/kdb/dump.txt before
+	  setting to 2.
+
+config KDB_USB
+	bool "Support for USB Keyboard in KDB"
+	depends on KDB && (USB_OHCI_HCD || USB_EHCI_HCD || USB_UHCI_HCD)
+	help
+	  If you want to use kdb from USB keyboards then say Y here.  If you
+	  say N then kdb can only be used from a PC (AT) keyboard or a serial
+	  console.
+
+config KDB_KDUMP
+	bool "Support for Kdump in KDB"
+	depends on KDB
+	select KEXEC
+	default N
+	help
+	  If you want to take Kdump kernel vmcore from KDB then say Y here.
+	  If unsure, say N.
+
+endmenu

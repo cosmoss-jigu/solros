@@ -1,0 +1,1 @@
+cmd_lib/pci-ring-buffer/build_kernel/pci_ring_buffer.o := k1om-mpss-linux-ld -m elf_k1om --defsym=MIC_KERNEL_VERSION_20626=0   -r -o lib/pci-ring-buffer/build_kernel/pci_ring_buffer.o lib/pci-ring-buffer/build_kernel/../lib/ring_buffer_scif.o lib/pci-ring-buffer/build_kernel/../lib/ring_buffer_porting.o 

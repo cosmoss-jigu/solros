@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+
+NUM_SOCKET = 2
+NUM_PHYSICAL_CPU_PER_SOCKET = 12
+SMT_LEVEL = 2
+
+OS_CPU_ID = {} # socket_id, physical_cpu_id, smt_id
+OS_CPU_ID[0,0,0] = 0   # 0, 0, 0
+OS_CPU_ID[0,0,1] = 24   # 0, 0, 1
+OS_CPU_ID[0,1,0] = 1   # 0, 1, 0
+OS_CPU_ID[0,1,1] = 25   # 0, 1, 1
+OS_CPU_ID[0,2,0] = 2   # 0, 2, 0
+OS_CPU_ID[0,2,1] = 26   # 0, 2, 1
+OS_CPU_ID[0,3,0] = 3   # 0, 3, 0
+OS_CPU_ID[0,3,1] = 27   # 0, 3, 1
+OS_CPU_ID[0,4,0] = 4   # 0, 4, 0
+OS_CPU_ID[0,4,1] = 28   # 0, 4, 1
+OS_CPU_ID[0,5,0] = 5   # 0, 5, 0
+OS_CPU_ID[0,5,1] = 29   # 0, 5, 1
+OS_CPU_ID[0,6,0] = 6   # 0, 8, 0
+OS_CPU_ID[0,6,1] = 30   # 0, 8, 1
+OS_CPU_ID[0,7,0] = 7   # 0, 9, 0
+OS_CPU_ID[0,7,1] = 31   # 0, 9, 1
+OS_CPU_ID[0,8,0] = 8   # 0, 10, 0
+OS_CPU_ID[0,8,1] = 32   # 0, 10, 1
+OS_CPU_ID[0,9,0] = 9   # 0, 11, 0
+OS_CPU_ID[0,9,1] = 33   # 0, 11, 1
+OS_CPU_ID[0,10,0] = 10   # 0, 12, 0
+OS_CPU_ID[0,10,1] = 34   # 0, 12, 1
+OS_CPU_ID[0,11,0] = 11   # 0, 13, 0
+OS_CPU_ID[0,11,1] = 35   # 0, 13, 1
+OS_CPU_ID[1,0,0] = 12   # 1, 0, 0
+OS_CPU_ID[1,0,1] = 36   # 1, 0, 1
+OS_CPU_ID[1,1,0] = 13   # 1, 1, 0
+OS_CPU_ID[1,1,1] = 37   # 1, 1, 1
+OS_CPU_ID[1,2,0] = 14   # 1, 2, 0
+OS_CPU_ID[1,2,1] = 38   # 1, 2, 1
+OS_CPU_ID[1,3,0] = 15   # 1, 3, 0
+OS_CPU_ID[1,3,1] = 39   # 1, 3, 1
+OS_CPU_ID[1,4,0] = 16   # 1, 4, 0
+OS_CPU_ID[1,4,1] = 40   # 1, 4, 1
+OS_CPU_ID[1,5,0] = 17   # 1, 5, 0
+OS_CPU_ID[1,5,1] = 41   # 1, 5, 1
+OS_CPU_ID[1,6,0] = 18   # 1, 8, 0
+OS_CPU_ID[1,6,1] = 42   # 1, 8, 1
+OS_CPU_ID[1,7,0] = 19   # 1, 9, 0
+OS_CPU_ID[1,7,1] = 43   # 1, 9, 1
+OS_CPU_ID[1,8,0] = 20   # 1, 10, 0
+OS_CPU_ID[1,8,1] = 44   # 1, 10, 1
+OS_CPU_ID[1,9,0] = 21   # 1, 11, 0
+OS_CPU_ID[1,9,1] = 45   # 1, 11, 1
+OS_CPU_ID[1,10,0] = 22   # 1, 12, 0
+OS_CPU_ID[1,10,1] = 46   # 1, 12, 1
+OS_CPU_ID[1,11,0] = 23   # 1, 13, 0
+OS_CPU_ID[1,11,1] = 47   # 1, 13, 1
+

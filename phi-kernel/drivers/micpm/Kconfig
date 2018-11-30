@@ -1,0 +1,30 @@
+if MK1OM || (ML1OM && MK1OM_TEST) 
+config	MIC_PM 
+	bool "Power Management for MIC devices"
+	help
+	  Include the PM driver for Intel MIC devices
+	  If in doubt, say N.
+if MIC_PM
+config	MIC_CPUFREQ
+	bool "cpufreq driver for MIC devices"
+	depends on MIC_PM
+	select CPU_FREQ
+	select CPU_FREQ_TABLE
+	select CPU_FREQ_DEBUG
+	select CPU_FREQ_DEFAULT_GOV_USERSPACE
+	select CPU_FREQ_GOV_USERSPACE
+	select CPU_FREQ_GOV_ONDEMAND
+	select CPU_FREQ_STAT
+	select CPU_FREQ_STAT_DETAILS
+	help
+	  Include the cpufreq driver for Intel MIC devices
+	  If in doubt, say N.						  		  		  
+
+config	MIC_CPUIDLE
+	bool "cpuidle driver for MIC devices"
+	depends on MIC_PM
+	help
+	  Include the cpuidle driver for Intel MIC devices
+	  If in doubt, say N.
+endif	  	
+endif

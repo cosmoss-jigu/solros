@@ -1,0 +1,115 @@
+.TH diod.conf 5 "@META_DATE@" "@META_ALIAS@" "@META_NAME@"
+.SH NAME
+diod.conf \- distributed I/O daemon configuration file
+.SH DESCRIPTION
+The diod.conf file is actually a LUA script.
+Internal config defaults are overridden by settings in the file,
+and some of those values can in turn be overridden on the command line.
+.LP
+Config settings take the form of LUA global variables which are read out
+after the config file is executed.  Therefore, the values of said variables
+can either be statically assigned or computed.
+The variables are described below.
+.SH "CONFIG VARIABLES"
+.TP
+.I "listen = { ""IP:PORT"" [,""IP:PORT"",...] }"
+List the interfaces and ports that \fBdiod\fR should listen on.
+The default is "0.0.0.0:564".
+.TP
+.I "exports = { ""/path"" [, ""/path"", ...] }"
+List the file systems that clients will be allowed to mount.
+All paths should be fully qualified.
+The exports table can include two types of element: a string element (as above),
+or an alternate table element form \fI{ path="/path", opts="ro" }\fR.
+In the alternate form, the (optional) opts attribute is a comma-separated
+list of export options, as described below in EXPORT OPTIONS.
+The two table element forms can be mixed in the exports table.
+Note that although \fBdiod\fR will not traverse file system boundaries
+for a given mount due to inode uniqueness constraints, subdirectories of 
+a file system can be separately exported.
+.TP
+.I "exportall = 1"
+Export all file systems listed in /proc/mounts.
+If new file systems are mounted after \fBdiod\fR
+has started, they will become immediately mountable.
+If there is a duplicate entry for a file system in the \fIexports\fR list,
+any options listed in the exports entry will apply.
+.TP
+.I "exportopts = ""opt,opt,..."""
+Establish a default set of export options.  These are overridden,
+not appended to, by opts attributes in an "exports" entry.
+.TP
+.I "nwthreads = INTEGER"
+Sets the (fixed) number of worker threads created to handle 9P requests
+for a unique aname.  The default is 16 per aname.
+.TP
+.I "auth_required = 0"
+Allow clients to connect without authentication, i.e. without a valid
+MUNGE credential.
+.TP
+.I "userdb = 0"
+This option disables password/group lookups.
+It allows any uid to attach and assumes gid=uid, and supplementary groups
+contain only the primary gid.
+.TP
+.I "allsquash = 1"
+Remap all users to "nobody".
+The attaching user need not be present in the password file.
+.TP
+\fIsquashuser = "nobody"\fR
+Change the squash user from the default of nobody.
+The squash user must be present in the password file.
+.TP
+\fIlogdest = "DEST"\fR
+Set the destination for logging.
+\fIDEST\fR is in the form of \fIsyslog:facility:level\fR or \fIfilename\fR.
+The default is \fIsyslog:daemon:err\fR.
+.TP
+.I "statfs_passthru = 1"
+This option configures statfs to return the host file system's type
+rather than V9FS_MAGIC.
+The default is 0 (return V9FS_MAGIC).
+.SH "EXPORT OPTIONS"
+The following export options are defined:
+.TP
+.I ro
+Export the file system read-only.
+.TP
+.I suppress
+Exclude this file system from exports.
+Useful following \fIexportall = 1\fR.
+.TP
+.I sharefd
+Allow limited server-side file descriptor sharing for files
+opened O_RDONLY by the same user.
+.TP
+.I privport
+Reject attach request unless client is bound to a port in the privileged
+port range (512-1023).
+The \fBdiodcat\fR utility has a \fI--privport\fR option which, when run
+as root, binds to a privileged socket before connecting.
+This provides limited additional security, especially in open networks,
+as it is vulnerable to IP spoofing attacks.
+.TP
+.I noauth
+Allow attach to succeed without authentication.
+.SH "EXAMPLE"
+.nf
+--
+-- example diod.conf
+--
+listen = { "0.0.0.0:10002" }
+exports = {
+	"/home",
+	"/usr/global",
+	{ path="ctl", opts="ro,noauth" },
+	{ path="/usr/local", opts="ro" },
+}
+nwthreads = 8
+.fi
+.SH "FILES"
+@X_SYSCONFDIR@/diod.conf
+.SH "SEE ALSO"
+lua (1), diod (8), openlog (3)
+.LP
+http://www.lua.org/

@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+import os
+import optparse
+import config
+import utils
+
+if __name__ == "__main__":
+   # nfs up
+   utils.sh("sudo exportfs -a")
+   utils.sh("sudo service nfs-kernel-server start")

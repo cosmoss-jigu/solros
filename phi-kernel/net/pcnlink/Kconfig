@@ -1,0 +1,7 @@
+#
+# pcnlink (PCIe Cloud Network) to host
+#
+config NET_PCN_LINK
+       depends on NET_9P_PRB && PCI_RING_BUFFER
+       tristate "pci ring buffer link over PCIe bus"
+       default m

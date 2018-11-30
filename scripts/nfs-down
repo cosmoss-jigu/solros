@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+import os
+import optparse
+import config
+import utils
+
+if __name__ == "__main__":
+   utils.sh("sudo service nfs-kernel-server stop")

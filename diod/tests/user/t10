@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# args: users, threads, gettattrs, iterations, aname
+
+./tattachmt 1 256 16 8 "$@"

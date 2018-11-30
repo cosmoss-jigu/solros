@@ -1,0 +1,2 @@
+kernel/lib/pci-ring-buffer/build_kernel/pci_ring_buffer.ko
+kernel/lib/pci-ring-buffer/build_kernel/pci_ring_buffer_test.ko

@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+import os
+import optparse
+import config
+import utils
+
+# default config.
+NFS_HOST_DIR = NVME_MNT
+NFS_MIC_DIR = "/mnt/nfs"
+
+if __name__ == "__main__":
+   # option parsing
+   parser = optparse.OptionParser()
+   parser.add_option("--host", help="host export path",
+                     action="store", type="string", dest="host", default=config.NFS_HOST_DIR)
+   parser.add_option("--mic", help="mic import path",
+                     action="store", type="string", dest="mic", default=config.NFS_MIC_DIR)
+   (opts, args) = parser.parse_args()
+
+   # mic up
+   MIC_UP = os.path.normpath(os.path.join(config.TOOLS_ROOT, "mic-up"))
+   utils.sh("sudo %s " % (MIC_UP))
+
+   # nfs setup
+   utils.sh("sudo exportfs -a")
+   utils.sh("sudo micctrl --addnfs=172.31.1.254:%s --dir=%s" % (opts.host, opts.mic))
+
+   # mic down
+   MIC_DOWN = os.path.normpath(os.path.join(config.TOOLS_ROOT, "mic-down"))
+   utils.sh("sudo %s " % (MIC_DOWN))

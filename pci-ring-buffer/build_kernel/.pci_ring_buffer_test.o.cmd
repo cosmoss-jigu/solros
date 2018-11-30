@@ -1,0 +1,1 @@
+cmd_lib/pci-ring-buffer/build_kernel/pci_ring_buffer_test.o := k1om-mpss-linux-ld -m elf_k1om --defsym=MIC_KERNEL_VERSION_20626=0   -r -o lib/pci-ring-buffer/build_kernel/pci_ring_buffer_test.o lib/pci-ring-buffer/build_kernel/../test_kernel/rbs-blocking-ut.o 

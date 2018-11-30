@@ -1,0 +1,9 @@
+all: run-tc
+
+run-tc: run-tc.c fblkmap.c fblkmap.h
+	gcc -g -O0 fblkmap.c run-tc.c -o run-tc
+
+clean:
+	rm -f *.o run-tc *.fbmdat
+
+.PHONY: alll run-tc clean

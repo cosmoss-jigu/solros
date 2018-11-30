@@ -1,0 +1,3 @@
+obj-m := nvme-p2p.o
+nvme-p2p-y := nvme-core.o nvme-scsi.o nvme-phi.o nvme-scif.o nvme-mic.o
+ccflags-y := -I$(HOST_KNL_SRC)
